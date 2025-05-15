@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catálogo de Servicios - Web Studio</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --pastel-rosa: #f3b3bb;
+      --pastel-verde: #acface;
+      --pastel-lila: #b49be7;
+      --gris-texto: #0b0b0b;
+      --blanco: #ffffff;
+      --sombra: 0 10px 30px rgba(0,0,0,0.1);
+      --transicion: all 0.3s ease;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(to bottom right, var(--pastel-rosa), var(--pastel-lila));
+      color: var(--gris-texto);
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    .burbuja {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #e8d7f1, #f1e6e3);
+      opacity: 0.3;
+      width: 200px;
+      height: 200px;
+      z-index: 0;
+      filter: blur(10px);
+      transition: var(--transicion);
+    }
+    .burbuja.top-left { top: -60px; left: -60px; }
+    .burbuja.top-right { top: -60px; right: -60px; }
+    .burbuja.bottom-right { bottom: -60px; right: -60px; }
+    .burbuja:hover {
+      transform: scale(1.1);
+      opacity: 0.4;
+    }
+
+    .seccion {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 4rem auto;
+      padding: 2rem;
+      background-color: var(--blanco);
+      border-radius: 20px;
+      box-shadow: var(--sombra);
+      transition: var(--transicion);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .seccion.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .seccion:hover {
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+      transform: translateY(-5px);
+    }
+
+    .titulo-principal {
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 3.8rem;
+      font-weight: bold;
+      color: #2f2f2f;
+      margin: 3rem auto 0;
+      width: 100%;
+      display: block;
+      position: static;
+      transform: none;
+    }
+
+    .titulo-principal::after {
+      content: '';
+      display: block;
+      width: 50%;
+      height: 4px;
+      background: linear-gradient(to right, var(--pastel-rosa), var(--pastel-lila));
+      border-radius: 2px;
+      margin: 10px auto 0;
+      transition: transform 0.5s ease;
+    }
+
+    .titulo-principal:hover::after {
+      transform: scaleX(1.2);
+    }
+    
+    .subtitulo-principal {
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 2.3rem;
+      font-weight: bold;
+      color: #2f2f2f;
+      margin-top: 1rem;
+      margin-bottom: 3rem;
+      opacity: 0.9;
+    }
+    
+    .titulo-seccion {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 1rem;
+      position: relative;
+      display: inline-block;
+    }
+    .titulo-seccion::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 50%;
+      height: 3px;
+      background: var(--pastel-lila);
+      border-radius: 2px;
+    }
+    
+    .subtitulo {
+      font-size: 1.1rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+    
+    .badge-nuevo, .badge-review {
+      background-color: var(--pastel-verde);
+      padding: 0.3rem 0.6rem;
+      font-size: 0.85rem;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+    
+    .card-servicio {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    
+    .card-texto {
+      flex: 1;
+      min-width: 300px;
+    }
+    
+    .card-imagen {
+      flex: 1;
+      text-align: center;
+      min-width: 300px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+    .card-imagen img {
+      max-width: 100%;
+      border-radius: 10px;
+      transition: var(--transicion);
+    }
+    .card-imagen:hover img {
+      transform: scale(1.05);
+    }
+    .card-imagen::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, rgba(180,155,231,0.2), rgba(243,179,187,0.2));
+      opacity: 0;
+      transition: var(--transicion);
+    }
+    .card-imagen:hover::before {
+      opacity: 1;
+    }
+    
+    .etiquetas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .etiqueta {
+      background-color: var(--pastel-lila);
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      transition: var(--transicion);
+      cursor: default;
+    }
+    .etiqueta:hover {
+      background-color: var(--pastel-rosa);
+      transform: translateY(-3px);
+    }
+    
+    .btn-contacto {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 0.8rem 2rem;
+      background: linear-gradient(45deg, var(--pastel-lila), var(--pastel-rosa));
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 5px 15px rgba(180,155,231,0.4);
+      transition: var(--transicion);
+      cursor: pointer;
+    }
+    .btn-contacto:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(180,155,231,0.6);
+      background: linear-gradient(45deg, var(--pastel-rosa), var(--pastel-lila));
+    }
+    .btn-contacto:active {
+      transform: translateY(0);
+    }
+    
+    .formulario-contacto {
+      display: none;
+      margin-top: 2rem;
+      padding: 2rem;
+      background-color: rgba(255,255,255,0.9);
+      border-radius: 15px;
+      box-shadow: var(--sombra);
+    }
+    .formulario-contacto.visible {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .form-control {
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      padding: 0.8rem;
+      transition: var(--transicion);
+    }
+    .form-control:focus {
+      border-color: var(--pastel-lila);
+      box-shadow: 0 0 0 0.25rem rgba(180,155,231,0.25);
+    }
+    
+    .testimonios {
+      margin-top: 3rem;
+    }
+    .testimonio {
+      background-color: rgba(255,255,255,0.8);
+      padding: 1.5rem;
+      border-radius: 15px;
+      margin-bottom: 1rem;
+      box-shadow: var(--sombra);
+      transition: var(--transicion);
+      cursor: pointer;
+    }
+    .testimonio:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    .testimonio .autor {
+      font-weight: bold;
+      margin-top: 1rem;
+      color: var(--pastel-lila);
+    }
+    
+    .pregunta {
+      margin-top: 1rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+    }
+    .pregunta-titulo {
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transicion);
+      padding: 0.5rem 0;
+    }
+    .pregunta-titulo:hover {
+      color: var(--pastel-lila);
+    }
+    .pregunta-titulo i {
+      transition: var(--transicion);
+    }
+    .pregunta.activa .pregunta-titulo i {
+      transform: rotate(180deg);
+    }
+    .pregunta-respuesta {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      padding-left: 1rem;
+    }
+    .pregunta-respuesta .contenido {
+      padding: 1rem;
+      background-color: rgba(243, 179, 187, 0.1);
+      border-radius: 8px;
+      margin-top: 0.5rem;
+    }
+    .pregunta.activa .pregunta-respuesta {
+      max-height: 300px;
+    }
+    
+    .mensaje-exito {
+      display: none;
+      background: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 5px;
+      border: 1px solid #c3e6cb;
+      margin-top: 20px;
+      align-items: center;
+      gap: 10px;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .mensaje-exito i {
+      font-size: 1.2rem;
+    }
+    
+    .mensaje-exito.mostrar {
+      display: flex;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    .scroll-indicator {
+      text-align: center;
+      margin: 2rem 0;
+      animation: float 2s ease-in-out infinite;
+    }
+    .scroll-indicator i {
+      font-size: 2rem;
+      color: rgba(255,255,255,0.7);
+    }
+    
+    footer {
+      background-color: #f2f2f2;
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.9rem;
+      margin-top: 4rem;
+      position: relative;
+    }
+    .redes-sociales {
+      margin-bottom: 1rem;
+    }
+    .redes-sociales a {
+      display: inline-block;
+      margin: 0 0.5rem;
+      color: #555;
+      font-size: 1.5rem;
+      transition: var(--transicion);
+    }
+    .redes-sociales a:hover {
+      color: var(--pastel-lila);
+      transform: translateY(-3px);
+    }
+    
+    @media (max-width: 768px) {
+      .titulo-principal {
+        font-size: 2.5rem;
+      }
+      .subtitulo-principal {
+        font-size: 1.8rem;
+      }
+      .seccion {
+        margin: 2rem auto;
+        padding: 1.5rem;
+      }
+      .card-servicio {
+        flex-direction: column;
+      }
+      .card-texto, .card-imagen {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="burbuja top-left"></div>
+  <div class="burbuja top-right"></div>
+  <div class="burbuja bottom-right"></div>
+
+  <div class="text-center my-4">
+    <img src="c:\Users\caroa\Downloads\logo.png" alt="Logo de la empresa" class="img-fluid" style="max-height: 300px;">
+  </div>
+  <!-- Título principal -->
+  <h1 class="titulo-principal animate__animated animate__fadeInDown">SixDesigns</h1>
+  <h2 class="subtitulo-principal animate__animated animate__fadeIn animate__delay-1s">Catálago de Servicios</h2>
+
+  <div class="scroll-indicator animate__animated animate__fadeIn animate__delay-2s">
+    <i class="fas fa-chevron-down"></i>
+  </div>
+
+  <!-- Sección: Nosotros -->
+  <section class="seccion" id="nosotros">
+    <h2 class="titulo-seccion">Nosotros</h2>
+    <p>Somos apasionados por el diseño y desarrollo web. Nos dedicamos a crear soluciones digitales únicas y personalizadas que reflejen la esencia de cada cliente. Nuestra meta es transformar ideas en experiencias digitales atractivas, funcionales y de alta calidad, impulsando así la presencia en línea de tu negocio.</p>
+    
+    <div class="testimonios">
+      <h3 class="titulo-seccion" style="font-size: 1.5rem;">Lo que dicen nuestros clientes</h3>
+      <div class="testimonio" onclick="this.classList.toggle('activo')">
+        <p>"Increíble trabajo y atención al detalle. Nuestro sitio web superó todas las expectativas."</p>
+        <div class="autor">- Carlos Estala, Laboratorio Dental</div>
+      </div>
+      <div class="testimonio" onclick="this.classList.toggle('activo')">
+        <p>"El equipo fue muy profesional y entendió exactamente lo que necesitábamos. ¡Altamente recomendados!"</p>
+        <div class="autor">- Flor Galaviz, Restaurante</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección: Diseño y Desarrollo de Sitios Web -->
+  <section class="seccion" id="diseno-web">
+    <div class="card-servicio">
+      <div class="card-texto">
+        <h1 class="titulo-seccion">Diseño y Desarrollo de Sitios Web</h1>
+        <p class="subtitulo">Creamos sitios web únicos, funcionales y responsivos, con diseño a medida, optimización SEO y excelente rendimiento.</p>
+        <p>Ideal para empresas, tiendas en línea, instituciones y organismos públicos.</p>
+        <h5>Características:</h5>
+        <ul>
+          <li>Diseño único y alineado con tu marca</li>
+          <li>Compatible con todos los dispositivos</li>
+          <li>Optimizado para buscadores (SEO)</li>
+          <li>Navegación intuitiva y efectiva</li>
+          <li>Gestión de contenido con CMS</li>
+        </ul>
+        <div class="etiquetas">
+          <div class="etiqueta">Diseño</div>
+          <div class="etiqueta">CMS</div>
+          <div class="etiqueta">SEO</div>
+          <div class="etiqueta">Responsive</div>
+        </div>
+        <button class="btn-contacto" onclick="mostrarFormulario('diseno-web')">
+          Solicitar este servicio
+        </button>
+        
+        <div class="formulario-contacto" id="form-diseno-web">
+          <h4>Consulta sobre Diseño Web</h4>
+          <form onsubmit="enviarFormulario(event, 'diseno-web')">
+            <input type="text" class="form-control" placeholder="Nombre" required>
+            <input type="email" class="form-control" placeholder="Email" required>
+            <input type="tel" class="form-control" placeholder="Teléfono">
+            <textarea class="form-control" rows="3" placeholder="Cuéntanos sobre tu proyecto"></textarea>
+            <button type="submit" class="btn-contacto">Enviar consulta</button>
+          </form>
+          <div class="mensaje-exito" id="mensaje-exito-diseno">
+            <i class="fas fa-check-circle"></i> ¡Información enviada correctamente!
+          </div>
+        </div>
+      </div>
+      <div class="card-imagen">
+        <img src="https://i.pinimg.com/736x/b5/ac/e4/b5ace4cad712cc1282baec828c0bc87f.jpg" alt="Imagen sitio web">
+      </div>
+    </div>
+    
+    <div class="pregunta" id="pregunta-tiempo">
+      <div class="pregunta-titulo" onclick="togglePregunta('pregunta-tiempo')">
+        ¿Qué beneficios obtendré? <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="pregunta-respuesta">
+        <div class="contenido">
+          • Mayor visibilidad y posicionamiento en buscadores.
+          • Incremento en la confianza y credibilidad ante clientes potenciales.
+          • Herramienta efectiva para promocionar productos y servicios.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección: Aplicaciones Web -->
+  <section class="seccion" id="aplicaciones-web">
+    <div class="card-servicio">
+      <div class="card-texto">
+        <h1 class="titulo-seccion">Aplicaciones Web</h1>
+        <p class="subtitulo">Diseñamos aplicaciones web personalizadas que automatizan y optimizan los procesos internos de tu empresa.</p>
+        <p>Interacción con datos en tiempo real, mayor eficiencia y acceso desde cualquier dispositivo.</p>
+        <h5>Características:</h5>
+        <ul>
+          <li>Funcionalidad en tiempo real</li>
+          <li>Acceso desde cualquier dispositivo</li>
+          <li>Interfaz intuitiva y adaptada</li>
+          <li>Soluciones personalizadas</li>
+        </ul>
+        <div class="etiquetas">
+          <div class="etiqueta">Apps</div>
+          <div class="etiqueta">Tiempo Real</div>
+          <div class="etiqueta">Acceso Remoto</div>
+        </div>
+        <button class="btn-contacto" onclick="mostrarFormulario('aplicaciones-web')">
+          Solicitar este servicio
+        </button>
+        
+        <div class="formulario-contacto" id="form-aplicaciones-web">
+          <h4>Consulta sobre Aplicaciones Web</h4>
+          <form onsubmit="enviarFormulario(event, 'aplicaciones-web')">
+            <input type="text" class="form-control" placeholder="Nombre" required>
+            <input type="email" class="form-control" placeholder="Email" required>
+            <input type="tel" class="form-control" placeholder="Teléfono">
+            <textarea class="form-control" rows="3" placeholder="Describe la aplicación que necesitas"></textarea>
+            <button type="submit" class="btn-contacto">Enviar consulta</button>
+          </form>
+          <div class="mensaje-exito" id="mensaje-exito-aplicaciones">
+            <i class="fas fa-check-circle"></i> ¡Información enviada correctamente!
+          </div>
+        </div>
+      </div>
+      <div class="card-imagen">
+        <img src="https://i.pinimg.com/736x/43/3b/38/433b387028430913cb916514f5d4a136.jpg" alt="Imagen aplicación web">
+      </div>
+    </div>
+    
+    <div class="pregunta" id="pregunta-tecnologias">
+      <div class="pregunta-titulo" onclick="togglePregunta('pregunta-tecnologias')">
+        ¿Cómo aseguro la calidad? <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="pregunta-respuesta">
+        <div class="contenido">
+          El desarrollo de la aplicación se gestiona de forma estructurada y colaborativa. Desde el inicio del proyecto, la empresa acompaña al cliente en cada etapa, garantizando claridad, eficiencia y adaptabilidad a lo largo del proceso.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección: Optimización y Mantenimiento Web -->
+  <section class="seccion" id="mantenimiento">
+    <div class="card-servicio">
+      <div class="card-texto">
+        <h1 class="titulo-seccion">Optimización y Mantenimiento Web</h1>
+        <p class="subtitulo">Mantenemos tu sitio web actualizado, seguro y eficiente. Adaptado a estándares tecnológicos y centrado en el usuario.</p>
+        <p>Mejora continua del rendimiento y protección contra amenazas.</p>
+        <h5>Características:</h5>
+        <ul>
+          <li>Mejora continua del rendimiento</li>
+          <li>Actualización de seguridad constante</li>
+          <li>Optimización técnica</li>
+          <li>Adaptación a nuevas necesidades</li>
+          <li>Monitoreo proactivo</li>
+        </ul>
+        <div class="etiquetas">
+          <div class="etiqueta">Mantenimiento</div>
+          <div class="etiqueta">Seguridad</div>
+          <div class="etiqueta">Rendimiento</div>
+        </div>
+        <button class="btn-contacto" onclick="mostrarFormulario('mantenimiento')">
+          Solicitar este servicio
+        </button>
+        
+        <div class="formulario-contacto" id="form-mantenimiento">
+          <h4>Consulta sobre Mantenimiento Web</h4>
+          <form onsubmit="enviarFormulario(event, 'mantenimiento')">
+            <input type="text" class="form-control" placeholder="Nombre" required>
+            <input type="email" class="form-control" placeholder="Email" required>
+            <input type="tel" class="form-control" placeholder="Teléfono">
+            <textarea class="form-control" rows="3" placeholder="Cuéntanos sobre tu sitio web actual"></textarea>
+            <button type="submit" class="btn-contacto">Enviar consulta</button>
+          </form>
+          <div class="mensaje-exito" id="mensaje-exito-mantenimiento">
+            <i class="fas fa-check-circle"></i> ¡Información enviada correctamente!
+          </div>
+        </div>
+      </div>
+      <div class="card-imagen">
+        <img src="https://acerkate.com/storage/2021/03/mantenimiento-de-una-pagina-web-scaled.jpg" alt="Imagen mantenimiento web">
+      </div>
+    </div>
+    
+    <div class="pregunta" id="pregunta-mantenimiento">
+      <div class="pregunta-titulo" onclick="togglePregunta('pregunta-mantenimiento')">
+        ¿Qué incluye su servicio de mantenimiento? <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="pregunta-respuesta">
+        <div class="contenido">
+          Nuestro servicio de mantenimiento incluye: 
+          •  Actualización web: Mantiene el sitio funcional y optimizado con contenido fresco, compatibilidad con nuevos dispositivos y mejoras en diseño y plugins.
+          •  Velocidad optimizada: Reduce tiempos de carga mediante compresión de archivos, optimización de código, caché y uso de redes de entrega de contenido.
+          •  Seguridad robusta: Protege datos con certificados SSL, monitoreo contra amenazas, copias de seguridad y actualizaciones constantes.
+          •  Mejor experiencia de usuario: Diseño accesible, navegación intuitiva y rendimiento mejorado para garantizar interacción fluida y eficaz.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección: Contacto -->
+  <section class="seccion" id="contacto">
+    <div class="card-servicio">
+      <div class="card-texto">
+        <h1 class="titulo-seccion">Contáctanos</h1>
+        <p><i class="fas fa-map-marker-alt"></i> <strong>Dirección:</strong> San Nicolas de los Garza, Nuevo León, México.</p>
+        <p><i class="fas fa-envelope"></i> <strong>Correo:</strong> DiseñoWeb@gmail.com</p>
+        <p><i class="fas fa-phone"></i> <strong>Teléfono:</strong> (52) 1244-5778</p>
+        <div class="etiquetas">
+          <div class="etiqueta">Atención</div>
+          <div class="etiqueta">Soporte</div>
+        </div>
+        
+        <h3 class="titulo-seccion" style="font-size: 1.5rem; margin-top: 2rem;">Horario de atención</h3>
+        <p>Lunes a Viernes: 9:00 am - 6:00 pm</p>
+        <p>Sábados: 10:00 am - 2:00 pm</p>
+        
+        <button class="btn-contacto" onclick="mostrarFormulario('contacto-general')">
+          Envíanos un mensaje
+        </button>
+        
+        <div class="formulario-contacto" id="form-contacto-general">
+          <h4>Formulario de Contacto</h4>
+          <form onsubmit="enviarFormulario(event, 'contacto-general')">
+            <input type="text" class="form-control" placeholder="Nombre" required>
+            <input type="email" class="form-control" placeholder="Email" required>
+            <input type="tel" class="form-control" placeholder="Teléfono">
+            <select class="form-control">
+              <option>Selecciona un servicio</option>
+              <option>Diseño Web</option>
+              <option>Aplicaciones Web</option>
+              <option>Mantenimiento</option>
+              <option>Otro</option>
+            </select>
+            <textarea class="form-control" rows="3" placeholder="Tu mensaje"></textarea>
+            <button type="submit" class="btn-contacto">Enviar mensaje</button>
+          </form>
+          <div class="mensaje-exito" id="mensaje-exito-contacto">
+            <i class="fas fa-check-circle"></i> ¡Información enviada correctamente!
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-imagen">
+        <div style="width: 100%; height: 100%; min-height: 300px; background: linear-gradient(45deg, var(--pastel-lila), var(--pastel-rosa)); border-radius: 10px; display: flex; justify-content: center; align-items: center;">
+          <i class="fas fa-paper-plane" style="font-size: 5rem; color: white; opacity: 0.8;"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="redes-sociales">
+      <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+      <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+      <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+      <a href="#" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    </div>
+    <p>&copy; 2025 Empresa de Diseño Web. Todos los derechos reservados.</p>
+    <p>
+      <a href="#nosotros" style="color: #555; margin: 0 0.5rem;">Nosotros</a> | 
+      <a href="#diseno-web" style="color: #555; margin: 0 0.5rem;">Diseño Web</a> | 
+      <a href="#aplicaciones-web" style="color: #555; margin: 0 0.5rem;">Aplicaciones</a> | 
+      <a href="#mantenimiento" style="color: #555; margin: 0 0.5rem;">Mantenimiento</a> | 
+      <a href="#contacto" style="color: #555; margin: 0 0.5rem;">Contacto</a>
+    </p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+
+    function mostrarFormulario(id) {
+
+      document.querySelectorAll('.formulario-contacto').forEach(form => {
+        form.classList.remove('visible');
+      });
+      
+      const formulario = document.getElementById('form-' + id);
+      if (formulario) {
+        formulario.classList.add('visible');
+        formulario.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+    
+    function enviarFormulario(event, servicio) {
+      event.preventDefault();
+      const form = event.target;
+      
+      const mensajeExito = form.parentElement.querySelector('.mensaje-exito');
+      mensajeExito.classList.add('mostrar');
+      
+      form.style.display = 'none';
+      
+      form.reset();
+      
+      setTimeout(() => {
+        mensajeExito.classList.remove('mostrar');
+        form.style.display = 'block';
+      }, 5000);
+    }
+    
+    function togglePregunta(id) {
+      const pregunta = document.getElementById(id);
+      pregunta.classList.toggle('activa');
+      
+      const respuesta = pregunta.querySelector('.pregunta-respuesta');
+      const icono = pregunta.querySelector('.pregunta-titulo i');
+      
+      if (pregunta.classList.contains('activa')) {
+        respuesta.style.maxHeight = respuesta.scrollHeight + "px";
+        icono.style.transform = "rotate(180deg)";
+      } else {
+        respuesta.style.maxHeight = "0";
+        icono.style.transform = "rotate(0deg)";
+      }
+    }
+    
+    function observarSecciones() {
+      const secciones = document.querySelectorAll('.seccion');
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      secciones.forEach(seccion => {
+        observer.observe(seccion);
+      });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      observarSecciones();
+    });
+    
+    document.addEventListener('mousemove', function(e) {
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      
+      document.querySelector('.burbuja.top-left').style.transform = `translate(${x * 20}px, ${y * 20}px)`;
+      document.querySelector('.burbuja.top-right').style.transform = `translate(${-x * 20}px, ${y * 20}px)`;
+      document.querySelector('.burbuja.bottom-right').style.transform = `translate(${-x * 20}px, ${-y * 20}px)`;
+    });
+  </script>
+</body>
+</html>
